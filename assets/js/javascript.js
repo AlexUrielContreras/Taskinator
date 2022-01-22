@@ -1,6 +1,8 @@
 let formEl = document.querySelector("#task-form");
 let tasksToDoEl = document.querySelector("#task-to-do");
 let taskIdCounter = 0;
+var tasksInProgressEl = document.querySelector("#task-in-progress");
+var tasksCompletedEl = document.querySelector("#task-completed");
 
 let pageContentEl = document.querySelector("#page-content");
 
@@ -16,14 +18,21 @@ let taskFormHandler = function(event) {
 
     formEl.reset();
 
-    // Package up data as an object
-    let taskDataObj = {
-        name: taskNameInput,
-        type: taskTypeInput
-    };
-    
-    // Sends it as an argument to createTaskEl
-    createTaskEl(taskDataObj);
+    let isEdit = formEl.hasAttribute('data-task-id');
+    if (isEdit) {
+        var taskId = formEl.getAttribute("data-task-id");
+        completeEditTask(taskNameInput, taskTypeInput, taskId);
+      } 
+      // no data attribute, so create object as normal and pass to createTaskEl function
+      else {
+        var taskDataObj = {
+          name: taskNameInput,
+          type: taskTypeInput
+        };
+      
+        createTaskEl(taskDataObj);
+      }
+
 }
 
 let createTaskEl = function (taskDataObj) {
@@ -54,9 +63,12 @@ let createTaskEl = function (taskDataObj) {
    // Add entire list item to list
    tasksToDoEl.appendChild(listItemEl);  
 
+
    // increase task counter for next unique id 
    taskIdCounter++;
-}
+
+   
+};
 
 let createTaskActions = function(taskId) {
     let actionContainerEl = document.createElement("div");
@@ -134,6 +146,38 @@ let editTask = function(taskId) {
     formEl.setAttribute("data-task-id", taskId);
 }
 
+let completeEditTask = function(taskName, taskType, taskId) {
+    let taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
 
+    taskSelected.querySelector("h3.task-name").textContent = taskName;
+    taskSelected.querySelector("span.task-type").textContent = taskType;
+    alert("Task Updated!")
+    formEl.removeAttribute("data-task-id");
+    document.querySelector("#save-task").textContent = "Add Task";
+};
+
+let taskStatusChangeHandler = function(event) {
+    // get the task item's id
+  let taskId = event.target.getAttribute("data-task-id");
+
+  // get the currently selected option's value and convert to lowercase
+  let statusValue = event.target.value.toLowerCase();
+
+  // find the parent task item element based on the id
+  let taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+
+  if (statusValue === "to do") {
+    tasksToDoEl.appendChild(taskSelected);
+  } 
+  else if (statusValue === "in progress") {
+    tasksInProgressEl.appendChild(taskSelected);
+  } 
+  else if(statusValue === "completed") {
+    tasksCompletedEl.appendChild(taskSelected);
+  }
+};
+
+
+pageContentEl.addEventListener("change", taskStatusChangeHandler);
 pageContentEl.addEventListener("click", taskButtonHandler);
 formEl.addEventListener("submit", taskFormHandler);
