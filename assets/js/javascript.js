@@ -47,9 +47,6 @@ let createTaskEl = function (taskDataObj) {
     // add task id as a custom attribute
     listItemEl.setAttribute("data-task-id", taskIdCounter);
 
-    console.log(taskDataObj);
-    console.log(taskDataObj.status);
-
     // Create div to hold task info and add to list item
     let taskInfoEl = document.createElement("div");
 
@@ -211,7 +208,28 @@ let taskStatusChangeHandler = function(event) {
 
 let saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
- }
+}
+
+let loadTasks = function() {
+  // Gets task items from localStorage.
+
+  // Converts tasks from the string format back into an array of objects.
+
+  //Iterates through a tasks array and creates task elements on the page from it.
+
+ let savedTasks = localStorage.getItem("tasks");
+
+  if (!tasks) {
+    tasks = [];
+    return false;
+  } 
+    tasks = JSON.parse(savedTasks);
+
+  for (let i = 0; i < saveTasks.length; i++) {
+    createTaskEl(saveTasks[i]);
+  }
+}
+
 pageContentEl.addEventListener("change", taskStatusChangeHandler);
 pageContentEl.addEventListener("click", taskButtonHandler);
 formEl.addEventListener("submit", taskFormHandler);
